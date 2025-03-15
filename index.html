@@ -18,6 +18,8 @@
             --border-color: #e1e8ed;
             --hover-color: #357abd;
             --shadow-color: rgba(0, 0, 0, 0.1);
+            --active-tab-color: #4a90e2;
+            --inactive-tab-color: #e1e8ed;
         }
 
         body {
@@ -27,6 +29,7 @@
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
         }
 
         .container {
@@ -274,9 +277,45 @@
             color: var(--hover-color);
             text-decoration: underline;
         }
+
+        /* 在body样式后添加语言切换选项卡的样式 */
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .language-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            border: none;
+            background: none;
+        }
+
+        .language-tab.active {
+            background-color: var(--active-tab-color);
+            color: white;
+        }
+
+        .language-tab:not(.active):hover {
+            background-color: var(--inactive-tab-color);
+        }
     </style>
 </head>
 <body>
+    <div class="language-switcher">
+        <a href="#" class="language-tab active">中文</a>
+        <a href="en.html" class="language-tab">English</a>
+    </div>
     <div class="container">
         <h1>随机数生成器</h1>
         
