@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机数生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f7fa;
+            --text-color: #2c3e50;
+            --border-color: #e1e8ed;
+            --hover-color: #357abd;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            font-size: 2.2em;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px var(--shadow-color);
+        }
+
+        .settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--secondary-color);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .options {
+            background: var(--secondary-color);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            font-size: 1.1em;
+        }
+
+        .result-textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            background: white;
+            color: var(--text-color);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .separator-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .separator-input {
+            width: 100px !important;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .settings {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 添加动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .format-custom-group {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .format-help {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        .format-help ul {
+            margin: 5px 0;
+            padding-left: 20px;
+        }
+        .format-help code {
+            background: #f0f2f5;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .format-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: monospace;
+            resize: vertical;
+        }
+        .button-group {
+            display: grid;
+            gap: 10px;
+        }
+        
+        #downloadBtn:hover {
+            background-color: #218838 !important;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: var(--text-color);
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--hover-color);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>随机数生成器</h1>
+        
+        <div class="settings">
+            <div>
+                <div class="form-group">
+                    <label for="min">最小值</label>
+                    <input type="number" id="min" value="1">
+                </div>
+                <div class="form-group">
+                    <label for="max">最大值</label>
+                    <input type="number" id="max" value="100">
+                </div>
+            </div>
+            
+            <div>
+                <div class="form-group">
+                    <label for="count">生成数量</label>
+                    <input type="number" id="count" min="1" max="1000" value="5">
+                </div>
+                <div class="form-group">
+                    <label for="numberType">数字类型</label>
+                    <select id="numberType">
+                        <option value="int">整数</option>
+                        <option value="float">小数</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="options">
+            <div class="form-group hidden" id="decimalPlacesGroup">
+                <label for="decimalPlaces">小数点位数</label>
+                <input type="number" id="decimalPlaces" min="0" max="10" value="4" style="width: 80px;" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value > 10) this.value = 10;">
+            </div>
+            
+            <div class="form-group">
+                <label for="sort">排序方式</label>
+                <select id="sort">
+                    <option value="none">不排序</option>
+                    <option value="asc">升序</option>
+                    <option value="desc">降序</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>结果格式</label>
+                <div class="separator-group">
+                    <select id="formatPreset" onchange="updateFormat()">
+                        <option value="default">默认格式 (1, 2, 3)</option>
+                        <option value="space">空格分隔 (1 2 3)</option>
+                        <option value="line">每行一个</option>
+                        <option value="custom">自定义格式</option>
+                    </select>
+                </div>
+                <div id="formatCustomGroup" class="format-custom-group hidden">
+                    <div class="format-help">
+                        <p>格式说明：</p>
+                        <ul>
+                            <li><code>{n}</code> - 数字</li>
+                            <li><code>{i}</code> - 序号</li>
+                            <li>直接按回车换行</li>
+                        </ul>
+                        <p>示例：第{i}个数: {n}</p>
+                    </div>
+                    <textarea id="formatTemplate" class="format-input" rows="3" placeholder="例如：第{i}个数: {n}">第{i}个数: {n}</textarea>
+                </div>
+            </div>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="oddEven">
+                    <label for="oddEven">显示奇偶性</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="allowDuplicate" checked>
+                    <label for="allowDuplicate">允许重复</label>
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn" id="generate">生成随机数</button>
+        <button class="btn" id="stop" style="display: none; margin-top: 10px; background-color: #dc3545;">停止生成</button>
+        
+        <div class="result-container">
+            <div class="result-title">随机数结果：</div>
+            <textarea class="result-textarea" id="resultArea" readonly></textarea>
+            <div class="button-group">
+                <button class="btn" id="copyBtn" style="margin-top: 15px; margin-bottom: 10px;">复制结果</button>
+                <button class="btn" id="downloadBtn" style="margin-top: 10px; background-color: #28a745;">下载结果</button>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn" id="saveSettingsBtn" style="background-color: #ffc107; color: #000;">保存当前设置</button>
+                    <button class="btn" id="resetSettingsBtn" style="background-color: #6c757d;">恢复默认设置</button>
+                </div>
+                <button class="btn" id="clearResultBtn" style="margin-top: 10px; background-color: #dc3545;">清空结果</button>
+            </div>
+        </div>
+        <div class="footer">
+            <p>作者：<a href="https://github.com/ikdxhz" target="_blank">ikdxhz</a> | 更多工具：<a href="https://wz.ikdxhz.top" target="_blank">wz.ikdxhz.top</a></p>
+        </div>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generate');
+        const stopBtn = document.getElementById('stop');
+        const numberTypeSelect = document.getElementById('numberType');
+        const decimalPlacesGroup = document.getElementById('decimalPlacesGroup');
+        const separatorPreset = document.getElementById('separatorPreset');
+        const customSeparator = document.getElementById('customSeparator');
+        const resultArea = document.getElementById('resultArea');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const resetSettingsBtn = document.getElementById('resetSettingsBtn');
+        const clearResultBtn = document.getElementById('clearResultBtn');
+
+        // 默认设置
+        const defaultSettings = {
+            min: "1",
+            max: "100",
+            count: "5",
+            numberType: "int",
+            decimalPlaces: "4",
+            sort: "none",
+            formatPreset: "default",
+            formatTemplate: "第{i}个数: {n}",
+            oddEven: false,
+            allowDuplicate: true
+        };
+
+        // 恢复默认设置
+        function resetSettings() {
+            if (confirm('确定要恢复默认设置吗？')) {
+                // 清除保存的设置
+                localStorage.removeItem('randomNumberSettings');
+                
+                // 应用默认设置
+                document.getElementById('min').value = defaultSettings.min;
+                document.getElementById('max').value = defaultSettings.max;
+                document.getElementById('count').value = defaultSettings.count;
+                document.getElementById('numberType').value = defaultSettings.numberType;
+                document.getElementById('decimalPlaces').value = defaultSettings.decimalPlaces;
+                document.getElementById('sort').value = defaultSettings.sort;
+                document.getElementById('formatPreset').value = defaultSettings.formatPreset;
+                document.getElementById('formatTemplate').value = defaultSettings.formatTemplate;
+                document.getElementById('oddEven').checked = defaultSettings.oddEven;
+                document.getElementById('allowDuplicate').checked = defaultSettings.allowDuplicate;
+                
+                // 更新UI状态
+                decimalPlacesGroup.classList.toggle('hidden', defaultSettings.numberType === 'int');
+                updateFormat();
+                
+                alert('已恢复默认设置！');
+            }
+        }
+
+        // 清空结果
+        function clearResult() {
+            if (resultArea.value && confirm('确定要清空结果吗？')) {
+                resultArea.value = '';
+            }
+        }
+
+        // 添加按钮事件监听
+        resetSettingsBtn.addEventListener('click', resetSettings);
+        clearResultBtn.addEventListener('click', clearResult);
+
+        // 添加停止标志
+        let isGenerating = false;
+
+        // 停止生成
+        stopBtn.onclick = function() {
+            isGenerating = false;
+            stopBtn.style.display = 'none';
+            generateBtn.style.display = 'block';
+            generateBtn.disabled = false;
+            generateBtn.textContent = '生成随机数';
+        };
+
+        // 复制结果
+        copyBtn.onclick = function() {
+            navigator.clipboard.writeText(resultArea.value)
+                .then(() => alert('已复制到剪贴板！'))
+                .catch(err => alert('复制失败：' + err));
+        };
+
+        // 下载结果
+        downloadBtn.onclick = function() {
+            const blob = new Blob([resultArea.value], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const date = new Date();
+            const timestamp = `${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}_${date.getHours().toString().padStart(2,'0')}${date.getMinutes().toString().padStart(2,'0')}${date.getSeconds().toString().padStart(2,'0')}`;
+            a.href = url;
+            a.download = `随机数_${timestamp}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        };
+
+        // 监听数字类型变化
+        numberTypeSelect.addEventListener('change', function() {
+            decimalPlacesGroup.classList.toggle('hidden', this.value === 'int');
+        });
+
+        // 更新分隔符函数
+        function updateSeparator() {
+            const isCustom = separatorPreset.value === 'custom';
+            customSeparator.classList.toggle('hidden', !isCustom);
+        }
+
+        // 获取当前选择的分隔符
+        function getCurrentSeparator() {
+            const selectedValue = separatorPreset.value;
+            if (selectedValue === 'custom') {
+                return customSeparator.value || ',';
+            }
+            return selectedValue;
+        }
+
+        // 更新格式函数
+        function updateFormat() {
+            const formatPreset = document.getElementById('formatPreset');
+            const formatCustomGroup = document.getElementById('formatCustomGroup');
+            const formatTemplate = document.getElementById('formatTemplate');
+            
+            const isCustom = formatPreset.value === 'custom';
+            formatCustomGroup.classList.toggle('hidden', !isCustom);
+            
+            // 根据预设更新模板
+            if (!isCustom) {
+                switch(formatPreset.value) {
+                    case 'default':
+                        formatTemplate.value = '{n}';
+                        break;
+                    case 'space':
+                        formatTemplate.value = '{n}';
+                        break;
+                    case 'line':
+                        formatTemplate.value = '{n}\n';
+                        break;
+                }
+            }
+        }
+
+        // 格式化数字
+        function formatNumber(num, index, numberType, decimalPlaces) {
+            const formatPreset = document.getElementById('formatPreset');
+            const formatTemplate = document.getElementById('formatTemplate');
+            let template = '';
+            
+            if (formatPreset.value === 'custom') {
+                template = formatTemplate.value || '{n}';
+            } else {
+                switch(formatPreset.value) {
+                    case 'default':
+                        return numberType === 'float' ? num.toFixed(decimalPlaces) : num.toString() + ', ';
+                    case 'space':
+                        return numberType === 'float' ? num.toFixed(decimalPlaces) : num.toString() + ' ';
+                    case 'line':
+                        return (numberType === 'float' ? num.toFixed(decimalPlaces) : num.toString()) + '\n';
+                    default:
+                        template = '{n}';
+                }
+            }
+            
+            return template
+                .replace(/{n}/g, numberType === 'float' ? num.toFixed(decimalPlaces) : num.toString())
+                .replace(/{i}/g, (index + 1).toString());
+        }
+
+        async function startGenerate() {
+            generateBtn.style.display = 'none';
+            stopBtn.style.display = 'block';
+            isGenerating = true;
+            resultArea.value = ''; // 清空结果
+            try {
+                await generateRandomNumbers();
+            } catch (error) {
+                console.error('生成随机数时出错:', error);
+                alert('生成随机数时出错，请重试！');
+            } finally {
+                isGenerating = false;
+                stopBtn.style.display = 'none';
+                generateBtn.style.display = 'block';
+                generateBtn.disabled = false;
+                generateBtn.textContent = '生成随机数';
+            }
+        }
+
+        async function generateRandomNumbers() {
+            const min = parseFloat(document.getElementById('min').value);
+            const max = parseFloat(document.getElementById('max').value);
+            const count = parseInt(document.getElementById('count').value);
+            const numberType = document.getElementById('numberType').value;
+            const decimalPlaces = parseInt(document.getElementById('decimalPlaces').value);
+            const sortOption = document.getElementById('sort').value;
+            const showOddEven = document.getElementById('oddEven').checked;
+            
+            // 验证输入
+            if (isNaN(min) || isNaN(max) || isNaN(count) || min >= max || count <= 0) {
+                alert('请输入有效的数字范围和数量！');
+                return;
+            }
+
+            // 验证小数点位数
+            if (numberType === 'float') {
+                if (isNaN(decimalPlaces) || decimalPlaces < 0 || decimalPlaces > 10) {
+                    alert('小数点位数必须在 0-10 之间！');
+                    return;
+                }
+            }
+
+            const allowDuplicate = document.getElementById('allowDuplicate').checked;
+            
+            // 如果不允许重复，检查生成数量是否超过可能的范围
+            if (!allowDuplicate && numberType === 'int' && count > (max - min + 1)) {
+                alert(`不允许重复时，生成数量不能超过可能的整数个数 (${max - min + 1})`);
+                return;
+            }
+
+            // 生成随机数函数
+            function generateRandomNumber() {
+                let num;
+                if (numberType === 'int') {
+                    num = Math.floor(Math.random() * (max - min + 1)) + min;
+                } else {
+                    // 对于浮点数，为了避免重复，增加精度
+                    num = Math.random() * (max - min) + min;
+                    num = parseFloat(num.toFixed(Math.min(decimalPlaces + 2, 10)));
+                }
+                return num;
+            }
+            
+            // 生成随机数
+            let numbers = allowDuplicate ? [] : new Set();
+            let attempts = 0;
+            const maxAttempts = count * 100; // 最大尝试次数，防止无限循环
+            
+            if (allowDuplicate) {
+                // 允许重复的情况
+                for (let i = 0; i < count && isGenerating; i++) {
+                    const num = generateRandomNumber();
+                    numbers.push(num);
+                    let formattedNum = formatNumber(num, i, numberType, decimalPlaces);
+                    resultArea.value += formattedNum;
+                    resultArea.scrollTop = resultArea.scrollHeight;
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+            } else {
+                // 不允许重复的情况
+                while (numbers.size < count && attempts < maxAttempts && isGenerating) {
+                    const num = generateRandomNumber();
+                    if (!numbers.has(num)) {
+                        numbers.add(num);
+                        let formattedNum = formatNumber(num, numbers.size - 1, numberType, decimalPlaces);
+                        resultArea.value += formattedNum;
+                        resultArea.scrollTop = resultArea.scrollHeight;
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                    }
+                    attempts++;
+                    
+                    if (attempts === maxAttempts && numbers.size < count) {
+                        alert('无法生成足够的不重复随机数，请扩大数字范围或减少生成数量。');
+                        return;
+                    }
+                }
+            }
+            
+            // 如果需要排序且没有被停止，重新显示所有数字
+            if (sortOption !== 'none' && isGenerating) {
+                let numbersArray = allowDuplicate ? numbers : Array.from(numbers);
+                if (sortOption === 'asc') {
+                    numbersArray.sort((a, b) => a - b);
+                } else {
+                    numbersArray.sort((a, b) => b - a);
+                }
+                
+                resultArea.value = '';
+                for (let i = 0; i < numbersArray.length && isGenerating; i++) {
+                    const num = numbersArray[i];
+                    let formattedNum = formatNumber(num, i, numberType, decimalPlaces);
+                    resultArea.value += formattedNum;
+                    resultArea.scrollTop = resultArea.scrollHeight;
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+            }
+
+            if (!isGenerating) {
+                return;
+            }
+        }
+        
+        generateBtn.addEventListener('click', startGenerate);
+        
+        // 初始化时隐藏小数点位数选项
+        decimalPlacesGroup.classList.add('hidden');
+
+        // 保存设置
+        function saveSettings() {
+            const settings = {
+                min: document.getElementById('min').value,
+                max: document.getElementById('max').value,
+                count: document.getElementById('count').value,
+                numberType: document.getElementById('numberType').value,
+                decimalPlaces: document.getElementById('decimalPlaces').value,
+                sort: document.getElementById('sort').value,
+                formatPreset: document.getElementById('formatPreset').value,
+                formatTemplate: document.getElementById('formatTemplate').value,
+                oddEven: document.getElementById('oddEven').checked,
+                allowDuplicate: document.getElementById('allowDuplicate').checked
+            };
+            
+            localStorage.setItem('randomNumberSettings', JSON.stringify(settings));
+            alert('设置已保存！');
+        }
+
+        // 加载设置
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('randomNumberSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                
+                document.getElementById('min').value = settings.min;
+                document.getElementById('max').value = settings.max;
+                document.getElementById('count').value = settings.count;
+                document.getElementById('numberType').value = settings.numberType;
+                document.getElementById('decimalPlaces').value = settings.decimalPlaces;
+                document.getElementById('sort').value = settings.sort;
+                document.getElementById('formatPreset').value = settings.formatPreset;
+                document.getElementById('formatTemplate').value = settings.formatTemplate;
+                document.getElementById('oddEven').checked = settings.oddEven;
+                document.getElementById('allowDuplicate').checked = settings.allowDuplicate;
+                
+                // 更新相关UI状态
+                decimalPlacesGroup.classList.toggle('hidden', settings.numberType === 'int');
+                updateFormat();
+            }
+        }
+
+        // 添加保存设置按钮事件监听
+        saveSettingsBtn.addEventListener('click', saveSettings);
+
+        // 页面加载时恢复设置
+        document.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
+</body>
+</html> 
