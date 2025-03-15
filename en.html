@@ -459,7 +459,9 @@
                 decimalPlacesGroup.classList.toggle('hidden', defaultSettings.numberType === 'int');
                 updateFormat();
                 
-                alert('Settings restored!');
+                resultArea.value = '';
+                
+                alert('Default settings restored!');
             }
         }
 
@@ -709,6 +711,9 @@
 
         saveSettingsBtn.addEventListener('click', saveSettings);
         document.addEventListener('DOMContentLoaded', loadSettings);
+
+        clearResultBtn.addEventListener('click', clearResult);
+        resetSettingsBtn.addEventListener('click', resetSettings);
     </script>
 </body>
 </html> 
